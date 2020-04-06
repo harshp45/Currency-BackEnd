@@ -2,4 +2,3 @@
     "mongoDBConnectURI": "mongodb+srv://n01359702:Harsh1234@harshdb-cm0lx.mongodb.net/Currency_Trading?retryWrites=true&w=majority",
     "jwtsecret": "secret"
 }
-
