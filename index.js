@@ -10,7 +10,7 @@ const currencies = require('./routes/api/currencies');
 const cors = require('cors');
 //Connect to DB
 connectDB();
-
+const port = process.env.PORT || 5000
 app.use(cors());
 
 app.use(express.json())
@@ -21,5 +21,5 @@ app.use('/weather', weatherRoute);
 app.use('/news', newsRoute);
 app.use('/currencies',currencies);
 app.use('/stocks',stockRouter);
-app.listen(5000, console.log('Server is Ready'));
+app.listen(port, console.log('Server is Ready'));
 
