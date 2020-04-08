@@ -9,7 +9,7 @@ const basecurrency = "CAD";
 const apiURL = "https://api.exchangeratesapi.io/latest?base="+basecurrency+"&HTTP/1.1";
 
 
-router.get('/base', (req,res) =>
+router.post('/base', (req,res) =>
 {
     basecurrency = req.body.base;
     res.on(basecurrency);
