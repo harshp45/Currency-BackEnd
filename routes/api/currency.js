@@ -81,6 +81,51 @@ http.get(apiURL, function(res)
             res.status(500).send('Server Error');
         }
     });
+
+    //Updating the currency rates into MongoDB just for reference
+    router.put('/update', async (req,res) => {
+
+        try
+        {
+            var rateResponse = JSON.parse(body);
+            const newrate = await rateslist.findById("5e8b61c568a5df3a8414cbdc");
+
+                newrate.base = rateResponse.base,
+                newrate.date = rateResponse.date,
+                newrate.rates =  
+                [{
+                    EUR: rateResponse.rates.EUR,
+                    CAD: rateResponse.rates.CAD,
+                    HKD: rateResponse.rates.HKD,
+                    ISK: rateResponse.rates.ISK,
+                    PHP: rateResponse.rates.PHP,
+                    DKK: rateResponse.rates.DKK,
+                    HUF: rateResponse.rates.HUF,
+                    CZK: rateResponse.rates.CZK,
+                    GBP: rateResponse.rates.GBP,
+                    RON: rateResponse.rates.RON,
+                    SEK: rateResponse.rates.SEK,
+                    IDR: rateResponse.rates.IDR,
+                    INR: rateResponse.rates.INR,
+                    BRL: rateResponse.rates.BRL,
+                    USD: rateResponse.rates.USD,
+                    MXN: rateResponse.rates.MXN,
+                    SGD: rateResponse.rates.SGD,
+                    AUD: rateResponse.rates.AUD,
+                    ILS: rateResponse.rates.ILS,
+                    KRW: rateResponse.rates.KRW,
+                    PLN: rateResponse.rates.PLN
+                }]
+
+            const nRate = await newrate.save();
+            res.json(nRate);
+            res.end();   
+        }
+        catch (err) 
+        {
+            res.status(500).send('Server Error');
+        }
+    });
 });
 
 module.exports = router;
