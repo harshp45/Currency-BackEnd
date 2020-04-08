@@ -12,6 +12,7 @@ const apiURL = "https://api.exchangeratesapi.io/latest?base="+basecurrency+"&HTT
 router.get('/base', (req,res) =>
 {
     basecurrency = req.body.base;
+    res.on(basecurrency);
 })
 
 //fetching live currency rates through API
