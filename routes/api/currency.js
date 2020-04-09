@@ -8,7 +8,7 @@ const router = express.Router();
 // var basecurrency = "CAD";
 // var apiURL = "https://api.exchangeratesapi.io/latest?base="+basecurrency+"&HTTP/1.1";
 
-router.get('/base', (req,res) => 
+router.post('/base', (req,res) => 
 {
     var basecurrency = req.body.base;
     var apiURL = "https://api.exchangeratesapi.io/latest?base="+basecurrency+"&HTTP/1.1";
