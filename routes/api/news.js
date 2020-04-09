@@ -71,6 +71,43 @@ http.get(apiURL, function(res)
         }
     });
 
+     //Updating the currency rates into MongoDB to get updated rates on React App
+     router.put('/update', async (req, res) => {
+        try
+        {
+            var newsResponse = JSON.parse(body);
+            var arr = Array();    
+            
+            for(var i=0;i<newsResponse.articles.length;i++)
+            {
+                arr.push(
+                    {
+                        "name":newsResponse.articles[i].source.name,
+                        "author":newsResponse.articles[i].author,
+                        "title":newsResponse.articles[i].title,
+                        "description":newsResponse.articles[i].description,
+                        "url":newsResponse.articles[i].url,
+                        "content":newsResponse.articles[i].content
+                    }
+                )
+            }
+            const articlesdata = arr;
+            const newNews = await newslist.findById("5e697689e6c160330478ba3e");
+            
+            newNews.status = newsResponse.status,
+            newNews.totalResults = newsResponse.totalResults,
+            newNews.articles = articlesdata
+            
+    
+            const nNews = await newNews.save();
+            res.json(nNews);
+            res.end();   
+        }
+        catch (err) 
+        {
+            res.status(500).send('Server Error');
+        }
+     });
 });
 
 module.exports = router;
