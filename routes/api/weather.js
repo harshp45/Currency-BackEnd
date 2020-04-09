@@ -70,6 +70,45 @@ http.get(apiURL, function(res)
         }
     });
 
+     //Updating the weather into MongoDB to get updated weather on React App
+     router.put('/update', auth, async (req, res) => 
+     {
+        try
+        {
+            var weatherResponse = JSON.parse(body);
+            const newweather = await weatherlist.findById("5e69568c66daab40642aa9c4");
+
+                newweather.location = 
+                [{
+                    name: weatherResponse.location.name,         
+                    country: weatherResponse.location.country,
+                    region: weatherResponse.location.region,
+                    localtime: weatherResponse.location.localtime
+                }],
+                newweather.current = 
+                [{
+                    temperature: weatherResponse.current.temperature,
+                    wind_speed: weatherResponse.current.wind_speed,
+                    wind_dir: weatherResponse.current.wind_dir,
+                    pressure: weatherResponse.current.pressure,
+                    precipitation: weatherResponse.current.precipitation,
+                    humidity: weatherResponse.current.humidity,
+                    cloudcover: weatherResponse.current.cloudcover,
+                    feelslike: weatherResponse.current.feelslike,
+                    is_day: weatherResponse.current.is_day
+                }]
+            
+    
+            const nWeather = await newweather.save();
+            res.json(nWeather);
+            res.end();   
+        }
+        catch (err) 
+        {
+            res.status(500).send('Server Error');
+        }
+    });
+
 });
 
 module.exports = router;

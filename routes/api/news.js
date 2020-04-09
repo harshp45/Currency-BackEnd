@@ -71,7 +71,7 @@ http.get(apiURL, function(res)
         }
     });
 
-     //Updating the currency rates into MongoDB to get updated rates on React App
+     //Updating the news into MongoDB to get updated news on React App
      router.put('/update', async (req, res) => {
         try
         {

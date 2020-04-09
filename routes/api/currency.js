@@ -17,7 +17,7 @@ http.get(apiURL, function (res) {
     });
 
     //Fetching Rates
-    router.get('/base/list', auth, async (req, res) => {
+    router.get('/list', auth, async (req, res) => {
         try {
             const RateDb = await rateslist.findOne();
             //const inr = RateDb.rates[0].INR;
@@ -30,7 +30,7 @@ http.get(apiURL, function (res) {
     });
 
     //Adding the currency rates into MongoDB just for reference
-    router.post('/base/add', auth, async (req, res) => {
+    router.post('/add', auth, async (req, res) => {
         try {
             var rateResponse = JSON.parse(body);
             const newrate = new rateslist({
@@ -73,7 +73,7 @@ http.get(apiURL, function (res) {
     });
 
     //Updating the currency rates into MongoDB to get updated rates on React App
-    router.put('/base/update', async (req, res) => {
+    router.put('/update', auth, async (req, res) => {
         try {
             var rateResponse = JSON.parse(body);
             const newrate = await rateslist.findById("5e8b61c568a5df3a8414cbdc");
