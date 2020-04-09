@@ -5,7 +5,7 @@ const auth = require('../../middleware/auth');
 const rateslist = require('../../models/Rates');
 const router = express.Router();
 
-var basecurrency = "USD";
+var basecurrency = "CAD";
 var apiURL = "https://api.exchangeratesapi.io/latest?base="+basecurrency+"&HTTP/1.1";
 
 //fetching live currency rates through API
