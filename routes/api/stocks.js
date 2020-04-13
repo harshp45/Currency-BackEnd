@@ -1,19 +1,41 @@
 const express = require('express');
 const router = express.Router();
 const Stock = require('../../models/stock.model');
+const StockRates = require('../../models/stock.list');
 const StockTransaction = require('../../models/stockTransaction.model');
-const liveStockRate = require('../../controllers/stock/liveStockRate');
+const liveStockRate = require('../../controllers/liveStockRate');
 
 router.route('/').get(async (req, res) => {
     await Stock.findById('5e8a4b2c1c9d4400001f5dcf')
          .then((result) => res.send(result));
        
+});
+
+router.route('/stockrates').get(async (req,res) => {
+    await StockRates.findById('5e93c1e015355529f07099fe')
+    .then((result) => res.send(result));
 })
 
 router.route('/getRates').post(async (req,res)=>{
     // console.log(req.body.selling_code);
+    let amt=0;
     let data =  await liveStockRate.getLiveStockRate(req.body.code);
-    res.json(data[0].price);
+    await Stock.findById('5e8a4b2c1c9d4400001f5dcf').then((results)=>{
+        for (let i = 0; i < results.stocks.length; i++) {
+            const element = results.stocks[i];
+            if(element.stock === req.body.code){
+                console.log(element)
+                //console.log(element.amount)
+                amt = amt+element.amount
+            }
+        }
+        let obj = {
+            rate : data[0].price,
+            amount: amt
+        }
+    
+        res.send(obj);
+    })   
 
 })
 
@@ -65,7 +87,7 @@ router.route('/buyStock').post(async (req,res)=>{
 
 router.route('/getall').get(async (req,res)=>{
     try {
-        StockTransaction.find().then((results)=>res.json(results));
+        StockTransaction.find().then((results)=>res.send(results));
     } catch (e) {
         
     }

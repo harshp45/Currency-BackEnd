@@ -12,14 +12,26 @@ router.route('/calculate').post(async (req, res) => {
     try {
         const base = req.body.selling_currency;
         const to = req.body.buying_currency;
-        // console.log('hi'+currObj);
-        // let base = req.params.selling_currency;
-        // let to = 'INR'
-        // let price = 1;
-        // console.log("In calculate post" + base, to);
         value1 = await exchangeRateProvider.convertCurrency(base, to, 1);
-        console.log(value1);
-        res.json(value1);
+        let amt=0;
+        await Currency.findById('5e6c4b091c9d4400004b8c4a')
+        .then((results)=>{
+            for (let i = 0; i < results.currencies.length; i++) {
+                const element = results.currencies[i];
+                if(element.currency === base){
+                    //console.log(element)
+                    //console.log(element.amount)
+                    amt = amt+element.amount
+                }
+            }
+            let newobj = {
+                rate: value1,
+                amount: amt
+            }
+    
+            console.log('New Obj'+newobj.amount);
+            res.send(newobj);
+        })
     }
     catch (e) {
         res.send(e)
@@ -29,14 +41,25 @@ router.route('/calculate').post(async (req, res) => {
 })
 
 router.route('/').get(async (req, res) => {
-    Currency.findById('5e6c34705af7aa297ce3d987')
-        .then((results) => res.send(results))
+    Currency.findById('5e6c4b091c9d4400004b8c4a')
+        .then((results) => {
+            //console.log('hi'+results.currencies)
+            let newObj = {
+                currencies:['INR','CAD','USD'],
+                username:results.username
+            }
+
+            //console.log(newObj);
+            res.send(newObj)
+        })   
         .catch((e) => res.status(400).json(e))
 })
 
 router.route('/getall').get(async (req,res)=>{
     try {
-        Transaction.find().then((results)=>res.json(results));
+        Transaction.find().then((results)=>{
+            res.send(results)
+        });
     } catch (e) {
         
     }
@@ -86,7 +109,9 @@ router.route('/buy-sell').post(async (req, res) => {
             const element = user.currencies[i];
             if (element.currency === sell_currency) {
                 user.currencies[i].amount -= sell_amount;
+                break;
             }
+            
         }
 
         await Currency.findOneAndUpdate({ 'username': username }, { $push: { currencies: newCurrency } }, { useFindAndModify: false });
