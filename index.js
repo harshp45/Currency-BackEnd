@@ -18,6 +18,11 @@ const MongoStore = require('connect-mongo')(session)
 const passport = require('./login/passport');
 const loginRoute = require('./login/routes/user');
 
+//Connect to DB
+connectDB();
+const port = process.env.PORT || 5000
+app.use(cors());
+
 // MIDDLEWARE
 app.use(morgan('dev'))
 app.use(
@@ -43,10 +48,7 @@ app.use(passport.session()) // calls the deserializeUser
 
 app.use('/logins', loginRoute);
 
-//Connect to DB
-connectDB();
-const port = process.env.PORT || 5000
-app.use(cors());
+
 
 app.use(express.json())
 
