@@ -10,7 +10,39 @@ const currencies = require('./routes/api/currencies');
 const cors = require('cors');
 
 //Login Imports
+const express = require('express')
+const bodyParser = require('body-parser')
+const morgan = require('morgan')
+const session = require('express-session')
+const dbConnection = require('./login/database') 
+const MongoStore = require('connect-mongo')(session)
+const passport = require('./login/passport');
 const loginRoute = require('./login/routes/user');
+
+// MIDDLEWARE
+app.use(morgan('dev'))
+app.use(
+	bodyParser.urlencoded({
+		extended: false
+	})
+)
+app.use(bodyParser.json())
+
+// Sessions
+app.use(
+	session({
+		secret: 'fraggle-rock', //pick a random string to make the hash that is generated secure
+		store: new MongoStore({ mongooseConnection: dbConnection }),
+		resave: false, //required
+		saveUninitialized: false //required
+	})
+)
+
+// Passport
+app.use(passport.initialize())
+app.use(passport.session()) // calls the deserializeUser
+
+app.use('/logins', loginRoute);
 
 //Connect to DB
 connectDB();
@@ -20,7 +52,6 @@ app.use(cors());
 app.use(express.json())
 
 app.use('/user', userRoute);
-app.use('/login', loginRoute);
 app.use('/currency', currencyRoute);
 app.use('/weather', weatherRoute);
 app.use('/news', newsRoute);
