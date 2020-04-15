@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express()
-const userRoute = require('./routes/api/users');
 const currencyRoute = require('./routes/api/currency');
 const weatherRoute = require('./routes/api/weather');
 const newsRoute = require('./routes/api/news');
@@ -48,11 +47,8 @@ app.use(passport.session()) // calls the deserializeUser
 
 app.use('/logins', loginRoute);
 
-
-
 app.use(express.json())
 
-app.use('/user', userRoute);
 app.use('/currency', currencyRoute);
 app.use('/weather', weatherRoute);
 app.use('/news', newsRoute);

@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const config = require('config');
 const User = require('../database/models/user');
+const tokenModel = require('../../models/token');
 const passport = require('../passport');
 
 router.post('/signup', (req, res) => {
@@ -31,18 +34,47 @@ router.post('/signup', (req, res) => {
 
 router.post(
     '/login',
-    function (req, res, next) {
+     function (req, res, next) {
         console.log('routes/user.js, login, req.body: ');
         console.log(req.body)
         next()
     },
     passport.authenticate('local'),
-    (req, res) => {
+    async (req, res) => {
         console.log('logged in', req.user);
         var userInfo = {
             username: req.user.username
         };
         res.send(userInfo);
+
+        //Generate Token
+        const payload = {
+            user : {
+                id: req.user.id,
+                username: req.user.username
+            }
+        };
+       
+        const token = jwt.sign(payload, config.get('jwtsecret'), {
+                algorithm: 'HS256',
+                expiresIn: 30000000});
+  
+        console.log("Successfully Logged In"+JSON.stringify(token));
+
+        //Updating Token
+        try 
+        {
+            var tokenResponse = token;
+            console.log("Res: "+tokenResponse);
+            const newtoken = await tokenModel.findById("5e964be013bfd01bdc246524");
+
+            newtoken.token = tokenResponse;
+
+            const nToken = await newtoken.save();
+        }
+        catch (err) {
+            res.status(500).send('Server Error');
+        }
     }
 )
 
@@ -55,6 +87,19 @@ router.get('/', (req, res, next) => {
         res.json({ user: null })
     }
 })
+
+router.get('/token', async (req,res) => {
+    try
+    {
+        const tokenDb = await tokenModel.findOne();
+        res.send(tokenDb);
+
+    }
+    catch (err)
+    {
+        res.status(500).send('Server Error');
+    }
+});
 
 router.post('/logout', (req, res) => {
     if (req.user) {
