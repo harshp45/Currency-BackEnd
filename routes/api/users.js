@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 
 const userslist = require('../../models/User');
-
+const tokenlist = require('../../models/token');
 const router = express.Router();
 
 //Adding the data using POSTMAN
@@ -91,11 +91,25 @@ router.post('/login', async (req, res) => {
        
         const token = jwt.sign(payload, config.get('jwtsecret'), {
                 algorithm: 'HS256',
-                expiresIn: 300000});
-
+                expiresIn: 30000000});
+  
         console.log("Successfully Logged In");
         res.send("Successfully Logged In. Token = " + JSON.stringify(token));
     }
 
 });
+
+router.get('/token', async (req,res) => {
+    try
+    {
+        const tokenDb = await tokenlist.findOne();
+        res.send(tokenDb);
+
+    }
+    catch (err)
+    {
+        res.status(500).send('Server Error');
+    }
+});
+
 module.exports = router;
