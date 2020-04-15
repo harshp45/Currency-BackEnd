@@ -10,7 +10,6 @@ const currencies = require('./routes/api/currencies');
 const cors = require('cors');
 
 //Login Imports
-const express = require('express')
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const session = require('express-session')
