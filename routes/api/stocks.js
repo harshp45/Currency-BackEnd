@@ -4,9 +4,19 @@ const Stock = require('../../models/stock.model');
 const StockRates = require('../../models/stock.list');
 const StockTransaction = require('../../models/stockTransaction.model');
 const liveStockRate = require('../../controllers/liveStockRate');
+const tokenModel = require('../../models/token');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 
 router.route('/').get(async (req, res) => {
-    await Stock.findById('5e8a4b2c1c9d4400001f5dcf')
+     //Getting Token
+     const tokenDb = await tokenModel.findOne();
+     token = tokenDb.token;
+     //Decoding Token
+     const decoded = jwt.verify(token, config.get('jwtsecret'));
+     var username = JSON.stringify(decoded.user.username);
+
+    await Stock.findOne({ 'username': username })
          .then((result) => res.send(result));
        
 });
@@ -17,10 +27,16 @@ router.route('/stockrates').get(async (req,res) => {
 })
 
 router.route('/getRates').post(async (req,res)=>{
-    // console.log(req.body.selling_code);
+    //Getting Token
+    const tokenDb = await tokenModel.findOne();
+    token = tokenDb.token;
+    //Decoding Token
+    const decoded = jwt.verify(token, config.get('jwtsecret'));
+    var username = JSON.stringify(decoded.user.username);
+
     let amt=0;
     let data =  await liveStockRate.getLiveStockRate(req.body.code);
-    await Stock.findById('5e8a4b2c1c9d4400001f5dcf').then((results)=>{
+    await Stock.findOne({ 'username': username }).then((results)=>{
         for (let i = 0; i < results.stocks.length; i++) {
             const element = results.stocks[i];
             if(element.stock === req.body.code){
@@ -54,8 +70,14 @@ router.route('/sellStock').post(async (req,res)=>{
 
     res.json('Trans complete');
 
+     //Getting Token
+     const tokenDb = await tokenModel.findOne();
+     token = tokenDb.token;
+     //Decoding Token
+     const decoded = jwt.verify(token, config.get('jwtsecret'));
+     var username1 = JSON.stringify(decoded.user.username);
 
-    const user = await Stock.findOne({'username':username});
+    const user = await Stock.findOne({'username':username1});
 
     for(let i = 0;i<user.stocks.length;i++){
         const item = user.stocks[i]
@@ -80,9 +102,15 @@ router.route('/buyStock').post(async (req,res)=>{
     await trans.save();
     res.json('Trans complete');
 
+     //Getting Token
+     const tokenDb = await tokenModel.findOne();
+     token = tokenDb.token;
+     //Decoding Token
+     const decoded = jwt.verify(token, config.get('jwtsecret'));
+     var username1 = JSON.stringify(decoded.user.username);
 
     let newStock = { stock: buying_stock, amount: buying_amount };
-    await Stock.findOneAndUpdate({ 'username': username }, { $push: { stocks: newStock} }, { useFindAndModify: false });
+    await Stock.findOneAndUpdate({ 'username': username1 }, { $push: { stocks: newStock} }, { useFindAndModify: false });
 })
 
 router.route('/getall').get(async (req,res)=>{

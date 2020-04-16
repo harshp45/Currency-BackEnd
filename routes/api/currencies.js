@@ -4,6 +4,9 @@ const router = express.Router();
 const exchangeRateProvider = require('../../controllers/currency/exchange-rate-provider');
 const Currency = require('../../models/currency.model');
 const Transaction = require('../../models/transaction.model');
+const tokenModel = require('../../models/token');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 
 //exchangeRateProvider.convertCurrency("USD","INR",1).then((value)=>console.log(value));
 var value1;
@@ -13,25 +16,33 @@ router.route('/calculate').post(async (req, res) => {
         const base = req.body.selling_currency;
         const to = req.body.buying_currency;
         value1 = await exchangeRateProvider.convertCurrency(base, to, 1);
-        let amt=0;
-        await Currency.findById('5e6c4b091c9d4400004b8c4a')
-        .then((results)=>{
-            for (let i = 0; i < results.currencies.length; i++) {
-                const element = results.currencies[i];
-                if(element.currency === base){
-                    //console.log(element)
-                    //console.log(element.amount)
-                    amt = amt+element.amount
+        let amt = 0;
+
+        //Getting Token
+        const tokenDb = await tokenModel.findOne();
+        token = tokenDb.token;
+        //Decoding Token
+        const decoded = jwt.verify(token, config.get('jwtsecret'));
+        var username = JSON.stringify(decoded.user.username);
+
+        await Currency.findOne({ 'username': username })
+            .then((results) => {
+                for (let i = 0; i < results.currencies.length; i++) {
+                    const element = results.currencies[i];
+                    if (element.currency === base) {
+                        //console.log(element)
+                        //console.log(element.amount)
+                        amt = amt + element.amount
+                    }
                 }
-            }
-            let newobj = {
-                rate: value1,
-                amount: amt
-            }
-    
-            console.log('New Obj'+newobj.amount);
-            res.send(newobj);
-        })
+                let newobj = {
+                    rate: value1,
+                    amount: amt
+                }
+
+                console.log('New Obj' + newobj.amount);
+                res.send(newobj);
+            })
     }
     catch (e) {
         res.send(e)
@@ -41,27 +52,34 @@ router.route('/calculate').post(async (req, res) => {
 })
 
 router.route('/').get(async (req, res) => {
-    Currency.findById('5e6c4b091c9d4400004b8c4a')
+    //Getting Token
+    const tokenDb = await tokenModel.findOne();
+    token = tokenDb.token;
+    //Decoding Token
+    const decoded = jwt.verify(token, config.get('jwtsecret'));
+    var username = JSON.stringify(decoded.user.username);
+
+    await Currency.findOne({ 'username': username })
         .then((results) => {
             //console.log('hi'+results.currencies)
             let newObj = {
-                currencies:['INR','CAD','USD'],
-                username:results.username
+                currencies: ['INR', 'CAD', 'USD'],
+                username: results.username
             }
 
             //console.log(newObj);
             res.send(newObj)
-        })   
+        })
         .catch((e) => res.status(400).json(e))
 })
 
-router.route('/getall').get(async (req,res)=>{
+router.route('/getall').get(async (req, res) => {
     try {
-        Transaction.find().then((results)=>{
+        Transaction.find().then((results) => {
             res.send(results)
         });
     } catch (e) {
-        
+
     }
 })
 
@@ -70,6 +88,7 @@ router.route('/buy-sell').post(async (req, res) => {
     try {
         console.log("Inside buy");
         //console.log(value1);
+
         let username = req.body.username;
 
         let sell_currency = req.body.sell_currency;
@@ -88,7 +107,7 @@ router.route('/buy-sell').post(async (req, res) => {
 
 
         let buy_currency = req.body.buy_currency;
-        let buy_amount = req.body.sell_amount*value1;
+        let buy_amount = req.body.sell_amount * value1;
 
         const newBuyTrans = new Transaction({
             username: username,
@@ -103,7 +122,15 @@ router.route('/buy-sell').post(async (req, res) => {
 
         let newCurrency = { currency: buy_currency, amount: buy_amount };
         //console.log(username);
-        const user = await Currency.findOne({ 'username': username });
+
+        //Getting Token
+        const tokenDb = await tokenModel.findOne();
+        token = tokenDb.token;
+        //Decoding Token
+        const decoded = jwt.verify(token, config.get('jwtsecret'));
+        var username1 = JSON.stringify(decoded.user.username);
+
+        await Currency.findOne({ 'username': username1 })
 
         for (let i = 0; i < user.currencies.length; i++) {
             const element = user.currencies[i];
@@ -111,10 +138,10 @@ router.route('/buy-sell').post(async (req, res) => {
                 user.currencies[i].amount -= sell_amount;
                 break;
             }
-            
+
         }
 
-        await Currency.findOneAndUpdate({ 'username': username }, { $push: { currencies: newCurrency } }, { useFindAndModify: false });
+        await Currency.findOneAndUpdate({ 'username': username1 }, { $push: { currencies: newCurrency } }, { useFindAndModify: false });
         await user.save();
 
 
