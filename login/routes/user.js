@@ -57,7 +57,7 @@ router.post(
        
         const token = jwt.sign(payload, config.get('jwtsecret'), {
                 algorithm: 'HS256',
-                expiresIn: 30000000});
+                expiresIn: 300000});
   
         console.log("Successfully Logged In"+JSON.stringify(token));
 
