@@ -14,7 +14,7 @@ router.route('/').get(async (req, res) => {
      token = tokenDb.token;
      //Decoding Token
      const decoded = jwt.verify(token, config.get('jwtsecret'));
-     var username = JSON.stringify(decoded.user.username);
+     var username = decoded.user.username;
 
     await Stock.findOne({ 'username': username })
          .then((result) => res.send(result));
@@ -32,7 +32,7 @@ router.route('/getRates').post(async (req,res)=>{
     token = tokenDb.token;
     //Decoding Token
     const decoded = jwt.verify(token, config.get('jwtsecret'));
-    var username = JSON.stringify(decoded.user.username);
+    var username = decoded.user.username;
 
     let amt=0;
     let data =  await liveStockRate.getLiveStockRate(req.body.code);
@@ -75,7 +75,7 @@ router.route('/sellStock').post(async (req,res)=>{
      token = tokenDb.token;
      //Decoding Token
      const decoded = jwt.verify(token, config.get('jwtsecret'));
-     var username1 = JSON.stringify(decoded.user.username);
+     var username1 = decoded.user.username;
 
     const user = await Stock.findOne({'username':username1});
 
@@ -107,7 +107,7 @@ router.route('/buyStock').post(async (req,res)=>{
      token = tokenDb.token;
      //Decoding Token
      const decoded = jwt.verify(token, config.get('jwtsecret'));
-     var username1 = JSON.stringify(decoded.user.username);
+     var username1 = decoded.user.username;
 
     let newStock = { stock: buying_stock, amount: buying_amount };
     await Stock.findOneAndUpdate({ 'username': username1 }, { $push: { stocks: newStock} }, { useFindAndModify: false });

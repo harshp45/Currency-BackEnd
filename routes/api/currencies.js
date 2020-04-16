@@ -23,7 +23,7 @@ router.route('/calculate').post(async (req, res) => {
         token = tokenDb.token;
         //Decoding Token
         const decoded = jwt.verify(token, config.get('jwtsecret'));
-        var username = JSON.stringify(decoded.user.username);
+        var username = decoded.user.username;
 
         await Currency.findOne({ 'username': username })
             .then((results) => {
@@ -57,9 +57,9 @@ router.route('/').get(async (req, res) => {
     token = tokenDb.token;
     //Decoding Token
     const decoded = jwt.verify(token, config.get('jwtsecret'));
-    var username = JSON.stringify(decoded.user.username);
-
-    await Currency.findOne({ 'username': username })
+    var username = decoded.user.username;
+    console.log(username)
+    await Currency.findOne({ 'username':  username})
         .then((results) => {
             //console.log('hi'+results.currencies)
             let newObj = {
@@ -128,7 +128,7 @@ router.route('/buy-sell').post(async (req, res) => {
         token = tokenDb.token;
         //Decoding Token
         const decoded = jwt.verify(token, config.get('jwtsecret'));
-        var username1 = JSON.stringify(decoded.user.username);
+        var username1 = decoded.user.username;
 
         await Currency.findOne({ 'username': username1 })
 
