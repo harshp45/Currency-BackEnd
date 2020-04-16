@@ -130,7 +130,7 @@ router.route('/buy-sell').post(async (req, res) => {
         const decoded = jwt.verify(token, config.get('jwtsecret'));
         var username1 = decoded.user.username;
 
-        await Currency.findOne({ 'username': username1 })
+        const user = await Currency.findOne({ 'username': username1 })
 
         for (let i = 0; i < user.currencies.length; i++) {
             const element = user.currencies[i];
@@ -145,8 +145,9 @@ router.route('/buy-sell').post(async (req, res) => {
         await user.save();
 
 
-        res.json('Trans done');
+        res.send('Trans done');
     } catch (e) {
+        console.log(e)
         res.json('Error in trans');
     }
 
